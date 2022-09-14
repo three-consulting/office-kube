@@ -1,0 +1,7 @@
+---
+- name: Setup nodes
+  hosts: all
+  strategy: free
+  roles:
+    - install_prerequisites
+    - configure_networking

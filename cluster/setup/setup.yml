@@ -7,26 +7,11 @@
     - configure_networking
 
 - name: Create master node
-  become: true
   hosts: master
   roles:
     - create_master
 
-- name: Get join command from created master node
-  hosts: master
-  become: true
-  tasks:
-    - name: Get kubeadm join command
-      shell: kubeadm token create --kubeconfig /home/ubuntu/.kube/config --print-join-command
-      register: join_command_raw
-
-    - name: Set join command from raw
-      set_fact:
-        join_command: "{{ join_command_raw.stdout_lines[0] }}"
-
-- name: Join worker nodes to the cluster
+- name: Join worker nodes
   hosts: workers
-  become: yes
-  tasks:
-    - name: Join worker nodes to cluster
-      shell: "{{ hostvars['master'].join_command }} >> node_joined.txt"
+  roles:
+    - join_workers

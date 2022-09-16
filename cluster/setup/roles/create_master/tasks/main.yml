@@ -1,8 +1,10 @@
 ---
 - name: Init the master node
+  become: true
   shell: kubeadm init --pod-network-cidr=10.244.0.0/16
 
-- name: Create .kube directory
+- name: Create user's .kube directory
+  become: true
   become_user: ubuntu
   file:
     path: $HOME/.kube
@@ -10,6 +12,7 @@
     mode: 0755
 
 - name: Copy admin.conf to user's kube config
+  become: true
   copy:
     src: /etc/kubernetes/admin.conf
     dest: /home/ubuntu/.kube/config
@@ -19,3 +22,20 @@
 - name: Deploy flannel as CNI
   become_user: ubuntu
   shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/3903d9e9c17a2f0db9d8ac0d6edc2e56357da67b/Documentation/kube-flannel.yml
+
+- name: Label nodes
+  become: false
+  shell: |
+    kubectl label node master node-role.kubernetes.io/master=master
+    kubectl label node node-1 node-role.kubernetes.io/node=node
+    kubectl label node node-2 node-role.kubernetes.io/node=node
+    kubectl label node node-3 node-role.kubernetes.io/node=node
+
+- name: Get kubeadm join command for worker nodes
+  become: true
+  shell: kubeadm token create --kubeconfig /home/ubuntu/.kube/config --print-join-command
+  register: join_command_raw
+
+- name: Set join command from raw
+  set_fact:
+    join_command: "{{ join_command_raw.stdout_lines[0] }}"

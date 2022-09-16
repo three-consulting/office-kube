@@ -15,3 +15,8 @@
   hosts: workers
   roles:
     - join_workers
+
+- name: Label nodes
+  hosts: master
+  roles:
+    - label_nodes

@@ -23,14 +23,6 @@
   become_user: ubuntu
   shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/3903d9e9c17a2f0db9d8ac0d6edc2e56357da67b/Documentation/kube-flannel.yml
 
-- name: Label nodes
-  become: false
-  shell: |
-    kubectl label node master node-role.kubernetes.io/master=master
-    kubectl label node node-1 node-role.kubernetes.io/node=node
-    kubectl label node node-2 node-role.kubernetes.io/node=node
-    kubectl label node node-3 node-role.kubernetes.io/node=node
-
 - name: Get kubeadm join command for worker nodes
   become: true
   shell: kubeadm token create --kubeconfig /home/ubuntu/.kube/config --print-join-command

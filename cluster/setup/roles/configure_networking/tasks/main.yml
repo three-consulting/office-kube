@@ -1,0 +1,6 @@
+---
+- name: Load br_netfilter for IPv4 forwarding and letting iptables see bridged traffic
+  shell: modprobe br_netfilter
+
+- name: Set net.bridge.bridge-nf-call-iptables to 1
+  shell: echo '1' > /proc/sys/net/ipv4/ip_forward

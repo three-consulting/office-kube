@@ -1,0 +1,73 @@
+---
+- name: Update cache and install containerd
+  apt:
+    update_cache: true
+    name: containerd={{ containerd_version }}
+    state: present
+
+- name: Check if directory for containerd configuration exists
+  stat:
+   path: /etc/containerd
+  register: etc_containerd
+
+- name: Create directory for containerd configuration if it doesn't exist
+  file:
+    path: /etc/containerd
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: 0775
+  when: etc_containerd.stat.exists == false
+
+- name: Generate default containerd configuration
+  shell: containerd config default > /etc/containerd/config.toml
+
+- name: Make containerd use the systemd cgroup driver with runc
+  lineinfile:
+    path: /etc/containerd/config.toml
+    line: SystemdCgroup = true
+    insertafter: .*containerd.default_runtime.options*
+
+- name: Reload containerd
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: containerd
+
+- name: Install packages needed to use the Kubernetes apt repository
+  apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+    state: present
+
+- name: Download the Google Cloud public signing key
+  shell: curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+- name: Add the Kubernetes apt repository
+  shell: echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+- name: Update cache and install kubelet, kubeadm and kubectl
+  apt:
+    update_cache: true
+    pkg:
+      - kubelet={{ kube_tool_version }}
+      - kubeadm={{ kube_tool_version }}
+      - kubectl={{ kube_tool_version }}
+    state: present
+
+- name: Hold kubelet version
+  dpkg_selections:
+    name: kubelet
+    selection: hold
+
+- name: Hold kubeadm version
+  dpkg_selections:
+    name: kubeadm
+    selection: hold
+
+- name: Hold kubectl version
+  dpkg_selections:
+    name: kubectl
+    selection: hold

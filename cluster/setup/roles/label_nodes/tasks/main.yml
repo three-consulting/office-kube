@@ -1,0 +1,7 @@
+- name: Label nodes
+  become: false
+  shell: |
+    kubectl label node master node-role.kubernetes.io/master=master
+    kubectl label node node-1 node-role.kubernetes.io/node=node
+    kubectl label node node-2 node-role.kubernetes.io/node=node
+    kubectl label node node-3 node-role.kubernetes.io/node=node

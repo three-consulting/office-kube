@@ -1,0 +1,4 @@
+---
+- name: Join worker nodes to the cluster
+  become: true
+  shell: "{{ hostvars['master'].join_command }}"

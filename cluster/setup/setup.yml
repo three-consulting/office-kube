@@ -1,0 +1,22 @@
+---
+- name: Setup nodes
+  become: true
+  hosts: all
+  roles:
+    - install_prerequisites
+    - configure_networking
+
+- name: Create master node
+  hosts: master
+  roles:
+    - create_master
+
+- name: Join worker nodes
+  hosts: workers
+  roles:
+    - join_workers
+
+- name: Label nodes
+  hosts: master
+  roles:
+    - label_nodes

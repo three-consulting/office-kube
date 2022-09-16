@@ -1,0 +1,46 @@
+---
+- name: Destroy all your hard work
+  become: true
+  hosts: all
+  tasks:
+    - name: Reset kubeadm
+      shell: kubeadm reset --force
+
+    - name: Clean CNI configuration
+      file:
+        path: /etc/cni/net.d
+        state: absent
+
+    - name: Remove kubeconfig from ubuntu user
+      file:
+        path: /home/ubuntu/.kube
+        state: absent
+
+    - name: Unhold kubeadm
+      dpkg_selections:
+        name: kubeadm
+        selection: install
+
+    - name: Unhold kubelet
+      dpkg_selections:
+        name: kubelet
+        selection: install
+    
+    - name: Unhold kubectl
+      dpkg_selections:
+        name: kubectl
+        selection: install
+
+    - name: Remove installed packages
+      apt:
+        pkg:
+          - containerd
+          - kubeadm
+          - kubelet
+          - kubectl
+        state: absent
+
+    - name: Remove containerd configuration
+      file:
+        path: /etc/containerd
+        state: absent

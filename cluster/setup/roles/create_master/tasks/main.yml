@@ -1,0 +1,21 @@
+---
+- name: Init the master node
+  shell: kubeadm init --pod-network-cidr=10.244.0.0/16
+
+- name: Create .kube directory
+  become_user: ubuntu
+  file:
+    path: $HOME/.kube
+    state: directory
+    mode: 0755
+
+- name: Copy admin.conf to user's kube config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/ubuntu/.kube/config
+    remote_src: yes
+    owner: ubuntu
+
+- name: Deploy flannel as CNI
+  become_user: ubuntu
+  shell: kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/3903d9e9c17a2f0db9d8ac0d6edc2e56357da67b/Documentation/kube-flannel.yml

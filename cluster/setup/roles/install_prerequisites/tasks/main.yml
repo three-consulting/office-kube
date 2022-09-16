@@ -1,6 +1,5 @@
 ---
 - name: Update cache and install containerd
-  become: true
   apt:
     update_cache: true
     name: containerd={{ containerd_version }}
@@ -12,7 +11,6 @@
   register: etc_containerd
 
 - name: Create directory for containerd configuration if it doesn't exist
-  become: true
   file:
     path: /etc/containerd
     state: directory
@@ -22,25 +20,21 @@
   when: etc_containerd.stat.exists == false
 
 - name: Generate default containerd configuration
-  become: true
   shell: containerd config default > /etc/containerd/config.toml
 
 - name: Make containerd use the systemd cgroup driver with runc
-  become: true
   lineinfile:
     path: /etc/containerd/config.toml
     line: SystemdCgroup = true
     insertafter: .*containerd.default_runtime.options*
 
 - name: Reload containerd
-  become: true
   systemd:
     state: restarted
     daemon_reload: yes
     name: containerd
 
 - name: Install packages needed to use the Kubernetes apt repository
-  become: true
   apt:
     pkg:
       - apt-transport-https
@@ -49,15 +43,12 @@
     state: present
 
 - name: Download the Google Cloud public signing key
-  become: true
   shell: curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
 
 - name: Add the Kubernetes apt repository
-  become: true
   shell: echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 - name: Update cache and install kubelet, kubeadm and kubectl
-  become: true
   apt:
     update_cache: true
     pkg:
@@ -67,19 +58,16 @@
     state: present
 
 - name: Hold kubelet version
-  become: true
   dpkg_selections:
     name: kubelet
     selection: hold
 
 - name: Hold kubeadm version
-  become: true
   dpkg_selections:
     name: kubeadm
     selection: hold
 
 - name: Hold kubectl version
-  become: true
   dpkg_selections:
     name: kubectl
     selection: hold

@@ -6,7 +6,7 @@ To deploy run
 kubectl apply -f -n echo echo-server.yaml
 ``` 
 
-No ingress controller is assumed to be present at this point, so to reach the echo server we need to forward the port of the pod.
+No ingress controller is assumed to be present at this point, so to reach the echo server we need to forward the port the service.
 ```bash
-kubectl port-forward -n echo <echo-server-pod> 8080
+kubectl -n echo port-forward svc/echo-server 8080
 ```

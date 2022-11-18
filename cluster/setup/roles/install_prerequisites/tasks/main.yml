@@ -71,3 +71,9 @@
   dpkg_selections:
     name: kubectl
     selection: hold
+
+- name: Install nfs-common to enable nfs storage provisioning
+  apt:
+    pkg:
+      - nfs-common
+    state: present

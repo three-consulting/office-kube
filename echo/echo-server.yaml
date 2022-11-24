@@ -12,7 +12,7 @@ metadata:
   name: echo-server
   namespace: echo
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: echo-server
@@ -36,9 +36,29 @@ metadata:
   namespace: echo
 spec:
   ports:
-    - name: http-port
+    - name: 8080-echo
       port: 8080
-      targetPort: http-port
       protocol: TCP
+      targetPort: 8080
   selector:
     app: echo-server
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echo-ingress
+  namespace: echo
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /echo
+            pathType: Prefix
+            backend:
+              service:
+                name: echo-server
+                port:
+                  number: 8080

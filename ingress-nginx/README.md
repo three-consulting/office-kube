@@ -6,5 +6,6 @@ helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
     --install \
     --namespace ingress-nginx \
     --create-namespace \
-    --version "4.4.0"
+    --version "4.4.0" \
+    --values ingress-nginx/nginx-values.yaml
 ```

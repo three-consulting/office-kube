@@ -29,12 +29,16 @@ Then you can run kubectl commands while specifying the correct config, e.g.
 kubectl --kubeconfig ~/.kube/office-kube-config get nodes
 ```
 
-Or the new config can be merged with an existing one, if you have already been using kubectl
+Or the new config can be merged with an existing one, if you have already been using kubectl:
+Make a copy of your existing config
+```bash 
+cp ~/.kube/config ~/.kube/config.bak
+```
+Merge the two config files together into a new config file 
 ```bash
-# Make a copy of your existing config 
-$ cp ~/.kube/config ~/.kube/config.bak 
-# Merge the two config files together into a new config file 
-$ KUBECONFIG=~/.kube/config:~/.kube/office-kube-config kubectl config view --flatten > new-config
-# Replace your old config with the new merged config 
-$ mv new-config ~/.kube/config 
+KUBECONFIG=~/.kube/config:~/.kube/office-kube-config kubectl config view --flatten > new-config
+```
+Replace your old config with the new merged config 
+```bash
+mv new-config ~/.kube/config 
 ```
